@@ -1,0 +1,138 @@
+a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+r+s+t
+
+a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*r*s*t
+
+a*b+c*d+e*f+g*h+i*j+k*l+m*n+o*p+r*s+t
+
+a+b*c+d*e+f*g+h*i+j*k+l*m+n*o+p*r+s*t
+
+a+b+c+d+e+f+g+h+i*j+k+l+m+n+o+p+r+s+t
+
+a*b*c*d*e*f*g*h*i+j*k*l*m*n*o*p*r*s*t
+
+a*b+c*d+e*f+g*h+i*j+k*l+m*n+o*p+r*s+t > a+b+c+d+e+f+g+h+i*j+k+l+m+n+o+p+r+s+t
+
+a*b+c*(d+e)*f+g*h+i*j+(k*l+m*n+o)*p+r*s+t > a+b+(c+d+e+f+g+h+i)*j+k+l+m+n+o+p+r+s+t
+
+stop() << b == c; ..stop() << e == f; ~
+
+i = 1i;
+long(1l) << low < ind("pricechannel", "high", 12c) & ind("macd", "macd", 96c, 192c, 18c) > ind("macd", "macds", 96c, 192c, 18c); 
+i += 1i; 
+log("i+=1i" + i); 
+~
+
+..[v_i1 < v_long_count & low > ind("sar", v_sar_max, v_sar_step, v_sar_init) & profit < 0.75%]
+{
+	long(1l) << low < ind("pricechannel", "high", 12c) & ind("macd", "macd", 96c, 192c, 18c) > ind("macd", "macds", 96c, 192c, 18c); 
+	v_i1 += 1i; 
+	log("v_i1+=1i"+v_i1); 
+	~
+};
+
+long(1l) << b == c; .. [account != 0p] {stop() << e == f; ..~}
+
+v_start_time = 00:00_13.10.14;
+v_end_time = 23:30_31.10.14;
+v_sar_init = 0.002p;
+v_sar_step = 0.002p;
+v_sar_max = 0.2p;
+v_sar_lmult = 10n;
+v_sar_smult = 10n;
+v_long_count = 4i;
+v_short_count = 4i;
+v_i1 = 0i;
+v_i2 = 0i;
+
+..[time >= v_start_time & time < v_end_time]
+{	
+	long(1l) << 
+		high #^ ind("sar", v_sar_max, v_sar_step, v_sar_init) & ind("macd", "macd", 96c, 192c, 18c) > 
+		ind("macd", "macds", 96c, 192c, 18c); 
+
+		log("sar_has_reversed_down");
+
+	v_i1 = 1i;
+
+	..[v_i1 < v_long_count & low > ind("sar", v_sar_max, v_sar_step, v_sar_init) & profit < 0.75%]
+	{
+		long(1l) << 
+			low < ind("pricechannel", "high", 12c) & ind("macd", "macd", 96c, 192c, 18c) > 
+			ind("macd", "macds", 96c, 192c, 18c); 
+		v_i1 += 1i; 
+		log("v_i1+=1i"+v_i1); 
+		~
+	};
+
+	stop << 
+		high > pos_price + v_sar_lmult * ind("atr", 24c) 
+		| 
+		low #_ sar(v_sar_max, v_sar_step, v_sar_init);
+ 
+		log("long_stop_happened" + pos_price + (pos_price + ind("atr", 24c) * l_mult))
+ 
+	|| 
+
+	short(1l) << 
+		low #_ ind("sar", v_sar_max, v_sar_step, v_sar_init) & ind("macd", "macd", 96c, 192c, 18c) < 
+		ind("macd", "macds", 96c, 192c, 18c); 
+		
+		log("sar_has_reversed_up");
+
+		v_i2 = 1i;
+
+		..[v_i2 < v_short_count & high < ind("sar", v_sar_max, v_sar_step, v_sar_init) & profit < 0.75%]
+		{
+			short(1l) << 
+				high > ind("pricechannel", "low", 12c) & ind("macd", "macd", 96c, 192c, 18c) < 
+				ind("macd", "macds", 96c, 192c, 18c); 
+			v_i2 += 1i; 
+			log("v_i2+=1i"+v_i2); 
+			~
+		};
+
+	stop << 
+		low > pos_price - v_sar_lmult * ind("atr", 24c) 
+		| 
+		high #^ sar(v_sar_max, v_sar_step, v_sar_init);
+ 
+		log("long_stop_happened" + pos_price + (pos_price + ind("atr", 24c) * l_mult))
+}
+
+
+
+// 6.11.2014
+.. // event_stack(event_list:1) <- ..:2; 
+   // parcer_status(event_list:1) <- event:2; event_next:2; cycle_condition:3;
+[a > b
+] // event_stack(..:2)
+  // parcer_status(call_2_arg:8) -> call_2_arg:8; compare_operator:7; math_operator:5;
+
+{
+//parcer_status(cycle_body:3) <-cycle_body:3; cycle_finish:3; event:4; event_condition:4; /*cycle's*/event_list:5 
+// event_stack(..:2) <- event_list:3;
+
+a//<-event:6;
+ 	
+()//->begin_expression:12; call_arg:11; all_arg_list:10 
+
+|| //parcer_status(mat_operator:8) -> mat_operator:8; begin_expression:7; /*a's*/event_condition:6; /*a's*/event_next:6; event_or_list:6; 
+   ///*cycle's*/event_list:5
+   //event_stack(event_list:3) <- a:4; event_list:3; a:4; event_or_list:4; a:5; ||:5
+b()
+
+}
+//1-parcer_status->math_operator:10, event_condition:9, event_next:8, event_list:7, event_or_list:6, ??cycle's event_list?, 
+//   event_condition:5, event_next:4, cycle_finish:3, event_next:2, event_list:1
+//2-parcer_status->math_operator:10; begin_expression:9; event_condition:8; event_next:8; event_list:7; event_or_list:6; /*cycle's*/event_list:5; 
+//   /*cycle's*/event_condition:4
+//3-parcer_status(math_operator:10)->math_operator:10; begin_expression:9; event_condition:8; event_next:8; event_list:7; event_or_list:6; /*cycle's*/event_list:5; 
+//   /*cycle's*/event_condition:4
+//3-event_stack(event_list:6)->b:7; ||:7; event_list:6
+
+
+;
+
+v()
+
+// roll_up_list - event_stack -> ||:3; ..:2

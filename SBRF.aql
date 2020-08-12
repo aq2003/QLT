@@ -1,0 +1,145 @@
+v_v_start_time	n0
+v_v_end_time	n0
+v_v_sar_init	n0
+v_v_sar_step	n0
+v_v_sar_max	n0
+v_v_sar_lmult	n0
+v_v_sar_smult	n0
+v_fastMA	n0
+v_slowMA	n0
+v_signalMA	n0
+v_v_long_count	n0
+v_v_short_count	n0
+v_v_i1	n0
+v_v_i2	n0
+v_longTP.period	n0
+v_shortTP.period	n0
+v_longTP.k_start	n0
+v_longTP.k_end	n0
+v_shortTP.k_start	n0
+v_shortTP.k_end	n0
+v_e_2300	e0
+v_e_3300	e0
+v_e_8100	e0
+e_0	log	e0	e_100	sscript_started
+e_100	=	e0	e_200	v_v_start_time	x00:00_10.11.14
+e_200	=	e0	e_300	v_v_end_time	x23:30_28.11.14
+e_300	=	e0	e_400	v_v_sar_init	p0.005
+e_400	=	e0	e_500	v_v_sar_step	p0.005
+e_500	=	e0	e_600	v_v_sar_max	p0.2
+e_600	=	e0	e_700	v_v_sar_lmult	n3
+e_700	=	e0	e_800	v_v_sar_smult	n3
+e_800	=	e0	e_901	v_fastMA	c48
+e_901	=	e0	e_1100	v_slowMA	e_900
+e_900	*	e0	e0	v_fastMA	n2
+e_1100	=	e0	e_1200	v_signalMA	c15
+e_1200	=	e0	e_1300	v_v_long_count	i4
+e_1300	=	e0	e_1400	v_v_short_count	i4
+e_1400	=	e0	e_1500	v_v_i1	i0
+e_1500	=	e0	e_1600	v_v_i2	i0
+e_1600	=	e0	e_1700	v_longTP.period	c120
+e_1700	=	e0	e_1800	v_shortTP.period	c120
+e_1800	=	e0	e_1900	v_longTP.k_start	n5
+e_1900	=	e0	e_2000	v_longTP.k_end	n1
+e_2000	=	e0	e_2100	v_shortTP.k_start	n5
+e_2100	=	e0	e_2200	v_shortTP.k_end	n1
+e_2200	log	e0	e_2300	svariables_initialized
+e_2300	..	e0	e_12100	e_2400	e_7200
+e_2400	<	e0	e0	#X	v_v_end_time
+e_2500	long	e_2603	e_3000	l2
+e_2603	&	e0	e0	e_2600	e_2602
+e_2602	#^	e0	e0	#H	e_2601
+e_2601	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_2600	>=	e0	e0	#X	v_v_start_time
+e_3000	log	e0	e_3100	ssar_has_reversed_down
+e_3100	=	e0	e_3200	v_v_i1	i1
+e_3200	~	e0	e_3300
+e_3300	..	e0	e_5800	e_3412	e_4700
+e_3412	&	e0	e0	e_3403	e_3411
+e_3411	<	e0	e0	#H	e_3410
+e_3410	+	e0	e0	#R	e_3409
+e_3409	*	e0	e0	e_3404	e_3408
+e_3408	=	e0	e0	v_v_sar_lmult	e_3407
+e_3407	*	e0	e0	v_longTP.k_start	e_3406
+e_3406	m-	e0	e0	c1	e_3405
+e_3405	/	e0	e0	#G	v_longTP.period
+e_3404	ind	e0	e0	satr	c24	n0	n0	n0
+e_3403	&	e0	e0	e_3400	e_3402
+e_3402	>	e0	e0	#L	e_3401
+e_3401	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_3400	<	e0	e0	v_v_i1	v_v_long_count
+e_4700	long	e_4805	e_5400	l2
+e_4805	&	e0	e0	e_4801	e_4804
+e_4804	>	e0	e0	e_4802	e_4803
+e_4803	ind	e0	e0	smacd	ssignal	v_fastMA	v_slowMA	v_signalMA
+e_4802	ind	e0	e0	smacd	smacd	v_fastMA	v_slowMA	v_signalMA
+e_4801	<	e0	e0	#L	e_4800
+e_4800	ind	e0	e0	spricechannel	slow	c12	n0	n0
+e_5400	+=	e0	e_5501	v_v_i1	i1
+e_5501	log	e0	e_5700	e_5500
+e_5500	+	e0	e0	sv_i1_=;	v_v_i1
+e_5700	~	e0	e0
+e_5800	stop	e_5910	e_7001
+e_5910	|	e0	e0	e_5907	e_5909
+e_5909	#_	e0	e0	#L	e_5908
+e_5908	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_5907	>	e0	e0	#H	e_5906
+e_5906	+	e0	e0	#R	e_5905
+e_5905	*	e0	e0	e_5900	e_5904
+e_5904	=	e0	e0	v_v_sar_lmult	e_5903
+e_5903	*	e0	e0	v_longTP.k_start	e_5902
+e_5902	m-	e0	e0	c1	e_5901
+e_5901	/	e0	e0	#G	v_longTP.period
+e_5900	ind	e0	e0	satr	c24	n0	n0	n0
+e_7001	log	e0	e0	e_7000
+e_7000	+	e0	e0	sv_sar_lmult_=;	v_v_sar_lmult
+e_7200	e|	e0	e_2500	e_12000
+e_7300	short	e_7403	e_7800	l2
+e_7403	&	e0	e0	e_7400	e_7402
+e_7402	#_	e0	e0	#L	e_7401
+e_7401	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_7400	>=	e0	e0	#X	v_v_start_time
+e_7800	log	e0	e_7900	ssar_has_reversed_up
+e_7900	=	e0	e_8000	v_v_i2	i1
+e_8000	~	e0	e_8100
+e_8100	..	e0	e_10600	e_8212	e_9500
+e_8212	&	e0	e0	e_8203	e_8211
+e_8211	>	e0	e0	#L	e_8210
+e_8210	m-	e0	e0	#R	e_8209
+e_8209	*	e0	e0	e_8204	e_8208
+e_8208	=	e0	e0	v_v_sar_smult	e_8207
+e_8207	*	e0	e0	v_shortTP.k_start	e_8206
+e_8206	m-	e0	e0	c1	e_8205
+e_8205	/	e0	e0	#G	v_shortTP.period
+e_8204	ind	e0	e0	satr	c24	n0	n0	n0
+e_8203	&	e0	e0	e_8200	e_8202
+e_8202	<	e0	e0	#H	e_8201
+e_8201	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_8200	<	e0	e0	v_v_i2	v_v_short_count
+e_9500	short	e_9605	e_10200	l2
+e_9605	&	e0	e0	e_9601	e_9604
+e_9604	<	e0	e0	e_9602	e_9603
+e_9603	ind	e0	e0	smacd	ssignal	v_fastMA	v_slowMA	v_signalMA
+e_9602	ind	e0	e0	smacd	smacd	v_fastMA	v_slowMA	v_signalMA
+e_9601	>	e0	e0	#H	e_9600
+e_9600	ind	e0	e0	spricechannel	shigh	c12	n0	n0
+e_10200	+=	e0	e_10301	v_v_i2	i1
+e_10301	log	e0	e_10500	e_10300
+e_10300	+	e0	e0	sv_i2_=;	v_v_i2
+e_10500	~	e0	e0
+e_10600	stop	e_10710	e_11801
+e_10710	|	e0	e0	e_10707	e_10709
+e_10709	#^	e0	e0	#H	e_10708
+e_10708	ind	e0	e0	ssar	v_v_sar_max	v_v_sar_step	v_v_sar_init	n0
+e_10707	<	e0	e0	#L	e_10706
+e_10706	m-	e0	e0	#R	e_10705
+e_10705	*	e0	e0	e_10700	e_10704
+e_10704	=	e0	e0	v_v_sar_smult	e_10703
+e_10703	*	e0	e0	v_shortTP.k_start	e_10702
+e_10702	m-	e0	e0	c1	e_10701
+e_10701	/	e0	e0	#G	v_shortTP.period
+e_10700	ind	e0	e0	satr	c24	n0	n0	n0
+e_11801	log	e0	e0	e_11800
+e_11800	+	e0	e0	sv_sar_smult_=;	v_v_sar_smult
+e_12000	e|	e0	e_7300	e0
+e_12100	stop	e0	e0

@@ -1,0 +1,16 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=qlt.chm
+Contents file=qlt.hhc
+Display compile progress=No
+Index file=qlt.hhk
+Language=0x419 Russian (Russia)
+
+
+[FILES]
+Variables.htm
+Actions.htm
+Indicators.htm
+
+[INFOTYPES]
+
