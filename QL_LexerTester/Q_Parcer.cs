@@ -43,9 +43,16 @@ namespace QL_LexerTester
         }
     }
 	
+    /// <summary>
+    /// A pacer class
+    /// Processes lexer_line which is a sequence of lexemmes coocked by <see cref="Q_Lexer"/> lexer and prepares staff for <see cref="Q_Gen"/> code generator
+    /// </summary>
     class Q_Parcer
     {
-        protected class ProcessRecord
+        /// <summary>
+        /// Describes a process which is an event sequence
+        /// </summary>
+        public class ProcessRecord
         {
             public string ProcessName;
             public string StartPoint;
@@ -67,7 +74,8 @@ namespace QL_LexerTester
         int CurrentAddress = 0;
 
         List<string> variables_table;
-        Dictionary<string, ProcessRecord> ProcessTable = new Dictionary<string, ProcessRecord>();
+        protected Dictionary<string, ProcessRecord> ProcessTable = new Dictionary<string, ProcessRecord>();
+        protected Q_Parcer Parent = null;
 
         lexeme_record[] lexer_line;
 
@@ -107,7 +115,16 @@ namespace QL_LexerTester
         // A special flag to watch comparisons have only two args
         int comparison_times;
 
-        public Q_Parcer(lexeme_record[] in_l, List<error_record> err_line, string process_name, List<string> var_table = null)
+
+        /// <summary>
+        /// Initializes <see cref="Q_Parcer"/> instance
+        /// </summary>
+        /// <param name="in_l">input lexer_line</param>
+        /// <param name="err_line">line to output errors</param>
+        /// <param name="process_name">The name of the current parcered named process</param>
+        /// <param name="var_table">Parent named process variables table; null means the root</param>
+        /// <param name="process_table">Parent process nested named processes table; null means the root</param>
+        public Q_Parcer(lexeme_record[] in_l, List<error_record> err_line, string process_name, List<string> var_table = null, Q_Parcer parent = null)
         {
             lexer_line = in_l;
             error_line = err_line;
@@ -125,6 +142,7 @@ namespace QL_LexerTester
             event_stack.Push(new parcer_record("event_list_start_mark"));
 
             variables_table = (var_table == null) ? new List<string>() : var_table;
+            Parent = parent;
         }
 
         bool c_assign(Int32 pos) { return c_assign(lexer_line[pos]); }
@@ -305,6 +323,15 @@ namespace QL_LexerTester
             return parcer_r.name;
         }
 
+        /// <summary>
+        /// Puts a call expression into parcer line with given name to call, arguments list and arguments count
+        /// Considers 2 types of a call: a command and a process
+        /// </summary>
+        /// <param name="name">Function or process name to call</param>
+        /// <param name="arg">Call arguments</param>
+        /// <param name="count">Number of call arguments</param>
+        /// <returns>Stringed call expression</returns>
+        // 13.08.2020
         string put_parcer_line_call(string name, string[] arg, int count)
         {
             // There are 2 ways to call a function: 
@@ -313,14 +340,27 @@ namespace QL_LexerTester
             // To recognize the way it needs to check ProcessTable; if name is presented there it means the way 2; else it means the way 1
             // To call a named process AQL uses a command ":=" (call)
             // IMPORTANT! Named process must be defined before first use otherwise it causes an error
+            // 13.08.2020
+            // Embedded command may be as native (known by the QMachine) as external (unknown by the QMachine and defined in an external library)
+            // External commands have to be defined in an external .NET assembly which has to be loaded by a calling script before the first use 
+            // The difference between a command and a process is that a command takes only one period of QM  to excecuteand does not contain conditions 
+            //  but a process takes more than one period and may contain conditions
 
             parcer_record parcer_r = new parcer_record(name);
 
             // Selecting the way
-            if (!ProcessTable.ContainsKey(((ProcessName.Length > 0) ? ProcessName + "_" : "") + name))
+            //if (!ProcessTable.ContainsKey(((ProcessName.Length > 0) ? ProcessName + "_" : "") + name))
+            // Looking for a predefined name in this and parent processes table
+            Q_Parcer parent = this;
+            while (parent != null && !parent.ProcessTable.ContainsKey(name)) parent = parent.Parent;
+
+            // There is no predefined names
+            if (parent == null)
             {
                 // The way 1 - embedded command
-                if (count > parcer_record.arg_count) parcer_r.arg = new string[count];
+                // 13.08.2020 commented
+                //if (count > parcer_record.arg_count) 
+                parcer_r.arg = new string[count];
                 int i = count;
                 while (i-- > 0)
                 {
@@ -330,17 +370,18 @@ namespace QL_LexerTester
             else
             {
                 // The way 2 - named process
-                name = ((ProcessName.Length > 0) ? ProcessName + "_" : "") + name;
-                /*if (count + 1 > parcer_record.arg_count)*/ parcer_r.arg = new string[2*count + 1];
+                //name = ((ProcessName.Length > 0) ? ProcessName + "_" : "") + name;
+                /*if (count + 1 > parcer_record.arg_count)*/
+                parcer_r.arg = new string[2 * count + 1];
 
                 parcer_r.code = ":=";
-                parcer_r.arg[0] = ProcessTable[name].StartPoint;
+                parcer_r.arg[0] = parent.ProcessTable[name].StartPoint;
 
                 int i = count + 1;
                 while (i-- > 1)
                 {
-                    parcer_r.arg[2*i] = arg[i - 1];
-                    parcer_r.arg[2*i - 1] = "s" + ProcessTable[name].VariablesTable[i - 1];
+                    parcer_r.arg[2 * i] = arg[i - 1];
+                    parcer_r.arg[2 * i - 1] = "s" + parent.ProcessTable[name].VariablesTable[i - 1];
                 }
             }
 
@@ -1198,7 +1239,7 @@ namespace QL_LexerTester
 
                     parcer_status.Pop();
                     string process_name = ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme;
-                    Q_Parcer prc = new Q_Parcer(lexer_line, error_line, process_name, process.VariablesTable);
+                    Q_Parcer prc = new Q_Parcer(lexer_line, error_line, process_name, process.VariablesTable, this);
 
                     int stack_count = stack.Count();
                     bool doit = true;

@@ -148,30 +148,32 @@ namespace QL_LexerTester
                         gen_line.Add(r.ToString(2));
                     }
 
-                    else if (r.code == "!" | r.code == "neg")
-                        gen_line.Add(r.ToString(1));
+            // 13.08.2020 commented
+            /*else if (r.code == "!" | r.code == "neg")
+                gen_line.Add(r.ToString(1));
 
-                    else if (r.code == "long" | r.code == "short" | r.code == "log")
-                        gen_line.Add(r.ToString(1));
+            else if (r.code == "long" | r.code == "short" | r.code == "log")
+                gen_line.Add(r.ToString(1));
 
-                    else if (r.code == "stop")
-                        gen_line.Add(r.ToString(1));
+            else if (r.code == "stop")
+                gen_line.Add(r.ToString(1));*/
 
-                    else if (r.code == "~")
+            else if (r.code == "~")
                         gen_line.Add(r.ToString(0));
 
-                    else if (r.code == "ind")
-                    {
-                        if (r.arg[0] == "sar") gen_line.Add(r.ToString(4));
-                        else if (r.arg[0] == "atr") gen_line.Add(r.ToString(2));
-                        else if (r.arg[0] == "macd") gen_line.Add(r.ToString(5));
-                        else if (r.arg[0] == "pricechannel") gen_line.Add(r.ToString(3));
-                        else gen_line.Add(r.ToString(5));
-                    }
+            // 13.08.2020 commented
+            /*else if (r.code == "ind")
+            {
+                if (r.arg[0] == "sar") gen_line.Add(r.ToString(4));
+                else if (r.arg[0] == "atr") gen_line.Add(r.ToString(2));
+                else if (r.arg[0] == "macd") gen_line.Add(r.ToString(5));
+                else if (r.arg[0] == "pricechannel") gen_line.Add(r.ToString(3));
+                else gen_line.Add(r.ToString(5));
+            }*/
 
-                    //else if (r.code == "error") gen_line.Add(r.condition + "\n");
+            //else if (r.code == "error") gen_line.Add(r.condition + "\n");
 
-                    else gen_line.Add(r.ToString(r.arg.Count()));
+            else gen_line.Add(r.ToString(r.arg.Count()));
             //    }
             //}
         }
