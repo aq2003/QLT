@@ -1,11 +1,12 @@
 # QL - A Language for Managing Processes
 
 ## 1. Basic Designations
-<small letters> - process instance<br/>
-Example: $a_0, a_1, a_3, ... a_n$ means processes $a_0, a_1, a_3, ... a_n$<br/>
+`small letters` - process instance<br/>
+Example: 
+$$a_0, a_1, a_3, ... a_n$$ means processes $$a_0, a_1, a_3, ... a_n$$<br/>
 
-<capital letters> - data objects<br/>
-Example: $A_0, A_1, A_3, ... A_n$ means processes $A_0, A_1, A_3, ... A_n$<br/>
+`capital letters` - data objects<br/>
+Example: $$A_0, A_1, A_3, ... A_n$$ means processes $$A_0, A_1, A_3, ... A_n$$<br/>
 
 symbols:<br/>
 - `;` - processes sequence by time
