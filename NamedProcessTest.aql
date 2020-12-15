@@ -1,15 +1,20 @@
-e_a_0	log	e0	e_a_201	sa_started
-e_a_201	=	e0	e_a_501	v_a_b	e_a_100
-e_a_100	+	e0	e0	v_a_b	v_a_b
-e_a_300	==	e0	e0	v_a_c	v_a_c
-e_a_501	=	e0	e_a_600	v_a_c	e_a_400
-e_a_400	+	e0	e0	v_a_c	v_a_c
-e_a_600	..	e0	e0	e_a_700	e_a_800
-e_a_700	>	e0	e0	v_a_b	v_a_b
+e_a_bbb_0	=	e0	e0	v_bbb	n1
+e_a_0	log	e0	e_a_101	sa_started
+e_a_101	=	e_a_300	e_a_401	v_b	e_a_100
+e_a_100	+	e0	e0	v_b	v_b
+e_a_300	==	e0	e0	v_c	v_c
+e_a_401	=	e0	e_a_600	v_c	e_a_400
+e_a_400	+	e0	e0	v_c	v_c
+e_a_600	..	e0	e_a_900	e_a_700	e_a_800
+e_a_700	>	e0	e0	v_b	v_b
 e_a_800	~	e0	e0
-e_a_bbb_0	=	e0	e0	v_a_bbb_bbb	n1
-e_0	log	e0	e_201	smain_started
-e_201	=	e0	e_401	v_ab	e_100
+e_a_900	:=	e0	e0	e_a_bbb_0
+e_0	log	e0	e_101	smain_started
+e_101	=	e0	e_301	v_ab	e_100
 e_100	+	e0	e0	v_ab	n1
-e_401	=	e0	e0	v_ba	e_300
+e_301	=	e0	e_500	v_ba	e_300
 e_300	+	e0	e0	v_ab	v_ba
+e_500	:=	e0	e_600	e_a_0
+e_600	:=	e0	e0	e_a_bbb_0
+v_a	def	a	e_a_0	v_a1	n0	v_a2	n0	v_a3	n0
+v_a.bbb	def	a.bbb	e_a_bbb_0	v_b1	n0

@@ -19,18 +19,45 @@ namespace QL_LexerTester
         public string code;
         public string condition;
         public string next;
-	    public string[] arg;
+	    public List<string> arg;
 
-	    public parcer_record(string c) 
+        /// <summary>
+        /// Initializes a new <see cref="parcer_record"/> instance
+        /// </summary>
+        /// <param name="c">Command code</param>
+        public parcer_record(string c) 
 	    {
 		    code = c;
             condition = "e0";
             next = "e0";
-            arg = new string[arg_count];
-            int i = arg_count;
-            while (i-- > 0) arg[i] = "n0";
-	    }
+            arg = new List<string>();
 
+            int arg_count = 0;
+            if (c == "!" | c == "~" | c == "def")
+                arg_count = 0;
+            else if (c == "==" | c == "!=" | c == ">" | c == "<" | c == ">=" | c == "<=" | c == "#^" | c == "#_" | c == "|" | c == "&"
+                 | c == "=" | c == "[]" | c == "+" | c == "-" | c == "*" | c == "/" | c == "+=" | c == "-=" | c == "*=" | c == "/=")
+                arg_count = 2;
+            else if (c == "!" | c == "abs" | c == "log")
+                arg_count = 1;
+            else if (c == "ind" | c == ":=")
+                arg_count = 10;
+            else if (c == ".." | c == "||" | c == "&&")
+                arg_count = 2;
+            else if (c == "long" | c == "short" | c == "stop")
+                arg_count = 2;
+            else
+                arg_count = 10;
+
+            for (int i = 0; i < arg_count; i++)
+                arg.Add("n0");
+        }
+
+
+        /// <summary>
+        /// Serializes <see cref="parcer_record"/> instance into a parcer output string
+        /// </summary>
+        /// <returns>Serialized instance</returns>
         public string ToString(int arg_number)
         {
             string res = name + "\t" + code + "\t" + condition + "\t" + next;
@@ -41,8 +68,25 @@ namespace QL_LexerTester
 
             return res;
         }
+
+        /// <summary>
+        /// Serializes <see cref="parcer_record"/> instance into a string
+        /// </summary>
+        /// <returns>Serialized instance</returns>
+        public override string ToString()
+        {
+            string res = "(" + name + "," + code + "," + condition + "," + next;
+
+            for (int i = 0; i < arg.Count; i++)
+            {
+                res += "," + arg[i++];
+            }
+            res += ")";
+
+            return res;
+        }
     }
-	
+
     /// <summary>
     /// A pacer class
     /// Processes lexer_line which is a sequence of lexemmes coocked by <see cref="Q_Lexer"/> lexer and prepares staff for <see cref="Q_Gen"/> code generator
@@ -50,19 +94,28 @@ namespace QL_LexerTester
     class Q_Parcer
     {
         /// <summary>
-        /// Describes a process which is an event sequence
+        /// Describes a named process which is a named event sequence with parameters
         /// </summary>
         public class ProcessRecord
         {
             public string ProcessName;
             public string StartPoint;
+            public int ArgCount = 0;
             public List<string> VariablesTable;
 
-            public ProcessRecord(string proc_name, string start_point, List<string> var_table)
+            /// <summary>
+            /// Initializes new <see cref="ProcessRecord"/> instance
+            /// </summary>
+            /// <param name="proc_name">Name of the process</param>
+            /// <param name="start_point">Start address</param>
+            /// <param name="var_table">Table of process variable names including parameters</param>
+            /// <param name="arg_count">Count of parameters</param>
+            public ProcessRecord(string proc_name, string start_point, List<string> var_table, int arg_count = 0)
             {
                 ProcessName = proc_name;
                 StartPoint = start_point;
                 VariablesTable = var_table;
+                ArgCount = arg_count;
             }
         }
 
@@ -74,13 +127,30 @@ namespace QL_LexerTester
         int CurrentAddress = 0;
 
         List<string> variables_table;
-        protected Dictionary<string, ProcessRecord> ProcessTable = new Dictionary<string, ProcessRecord>();
+        public Dictionary<string, ProcessRecord> ProcessTable { get; protected set; } = new Dictionary<string, ProcessRecord>();
         protected Q_Parcer Parent = null;
 
         lexeme_record[] lexer_line;
 
         List<parcer_record> parcer_line = new List<parcer_record>();
-        public parcer_record[] get_line() { return parcer_line.ToArray(); }
+        public parcer_record[] get_line() 
+        {
+            if (Parent == null)
+                foreach (var key in ProcessTable.Keys)
+                {
+                    parcer_record record = new parcer_record("def") { name = "v_" + key, condition = key, next = ProcessTable[key].StartPoint };
+                    if (ProcessTable[key].ArgCount > 0)
+                        for (int i = 0; i < ProcessTable[key].ArgCount; i++)
+                        {
+                            record.arg.Add("s" + ProcessTable[key].VariablesTable[i]);
+                            record.arg.Add("n0");
+                            //record.arg.AddRange(ProcessTable[key].VariablesTable.GetRange(0, ProcessTable[key].ArgCount));
+                        }
+                    parcer_line.Add(record);
+                }
+
+            return parcer_line.ToArray(); 
+        }
 
         List<error_record> error_line;
 
@@ -301,6 +371,7 @@ namespace QL_LexerTester
         {
             parcer_record parcer_r = new parcer_record(operat);
 
+            parcer_r.arg.Add("n0");
             parcer_r.arg[0] = arg;
             parcer_r.name = GetAddress();
 
@@ -314,6 +385,8 @@ namespace QL_LexerTester
         {
             parcer_record parcer_r = new parcer_record(operat);
 
+            parcer_r.arg.Add("n0"); 
+            parcer_r.arg.Add("n0");
             parcer_r.arg[0] = arg1;
             parcer_r.arg[1] = arg2;
             parcer_r.name = GetAddress();
@@ -360,28 +433,31 @@ namespace QL_LexerTester
                 // The way 1 - embedded command
                 // 13.08.2020 commented
                 //if (count > parcer_record.arg_count) 
-                parcer_r.arg = new string[count];
+                parcer_r.arg = new List<string>(count);
+                for (int j = 0; j < count; j++) parcer_r.arg.Add("n0");
+
                 int i = count;
                 while (i-- > 0)
-                {
                     parcer_r.arg[i] = arg[i];
-                }
             }
             else
             {
                 // The way 2 - named process
                 //name = ((ProcessName.Length > 0) ? ProcessName + "_" : "") + name;
                 /*if (count + 1 > parcer_record.arg_count)*/
-                parcer_r.arg = new string[2 * count + 1];
+                parcer_r.arg = new List<string>(2 * count + 1);
+
+                for (int j = 0; j < 2 * count + 1; j++) parcer_r.arg.Add("n0");
 
                 parcer_r.code = ":=";
-                parcer_r.arg[0] = parent.ProcessTable[name].StartPoint;
+                parcer_r.arg[0] = /*parent.*/ProcessTable[name].StartPoint /*"e_" + name + "_0"*/;
 
                 int i = count + 1;
                 while (i-- > 1)
                 {
                     parcer_r.arg[2 * i] = arg[i - 1];
-                    parcer_r.arg[2 * i - 1] = "s" + parent.ProcessTable[name].VariablesTable[i - 1];
+                    //parcer_r.arg[2 * i - 1] = "s" + parent.ProcessTable[name].VariablesTable[i - 1];
+                    parcer_r.arg[2 * i - 1] = "s" + ProcessTable[name].VariablesTable[i - 1];
                 }
             }
 
@@ -451,12 +527,13 @@ namespace QL_LexerTester
 
             var_table.AddRange(arg);
 
-            string start_point = "e_" + ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme + "_0";
-            string process_name = ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme;
+            string start_point = "e_" + /*((ProcessName != "") ? ProcessName + "_" : "") +*/ stack.Peek().lexeme + "_0";
+            //string process_name = ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme;
+            string process_name = /*((ProcessName != "") ? ProcessName + "." : "") +*/ stack.Peek().lexeme;
 
             parcer_status.Pop();
 
-            return new ProcessRecord(process_name, start_point, var_table);
+            return new ProcessRecord(process_name, start_point, var_table, var_table.Count);
         }
 
         // Variables are being managed here
@@ -1238,7 +1315,7 @@ namespace QL_LexerTester
                     ProcessTable.Add(process.ProcessName, process);
 
                     parcer_status.Pop();
-                    string process_name = ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme;
+                    string process_name = /*((ProcessName != "") ? ProcessName + "_" : "") +*/ stack.Peek().lexeme;
                     Q_Parcer prc = new Q_Parcer(lexer_line, error_line, process_name, process.VariablesTable, this);
 
                     int stack_count = stack.Count();
@@ -1255,8 +1332,32 @@ namespace QL_LexerTester
                         else pos++;
                     }
 
-                    CurrentAddress = prc.get_line().Count();
-                    parcer_line.AddRange(prc.get_line());
+                    parcer_record[] lines = prc.get_line();
+                    CurrentAddress = lines.Count();
+
+                    string prefix = "e_" + ((prc.ProcessName != "") ? prc.ProcessName + "_" : "");
+                    string prefix1 = "e_" + ((ProcessName != "") ? ProcessName + "_" : "");
+                    foreach (var line in lines)
+                    {
+                        line.name = prefix1 + line.name.Substring(2);
+                        if (line.code == ":=") 
+                            line.arg[0] = prefix + line.arg[0].Substring(2);
+                        if (line.code == "def") 
+                            line.next = prefix + line.next.Substring(2);
+                    }
+
+                    //parcer_line.AddRange(prc.get_line());
+                    parcer_line.AddRange(lines);
+
+                    // Adding parsed process name to its nested processes name
+                    foreach (var key in prc.ProcessTable.Keys)
+                    {
+                        ProcessRecord proc = prc.ProcessTable[key];
+                        //proc.ProcessName = ((prc.ProcessName != "") ? prc.ProcessName + "." : "") + proc.ProcessName;
+                        proc.StartPoint = "e_" + ((prc.ProcessName != "") ? prc.ProcessName + "_" : "") + proc.StartPoint.Substring(2);
+                        string new_key = ((prc.ProcessName != "") ? prc.ProcessName + "." : "") + proc.ProcessName;
+                        ProcessTable.Add(new_key, proc);
+                    }
 
                     parcer_status.Pop(); // call_2arg
 

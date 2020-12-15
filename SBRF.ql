@@ -45,7 +45,7 @@ log("variables_initialized");
  
 	log("v_sar_lmult_=;" + v_sar_lmult)
  
-	|| 
+|| 
 
 	short(2l) << time >= v_start_time & low #_ ind("sar", v_sar_max, v_sar_step, v_sar_init) /*& ind("macd", "macd", fastMA, slowMA, signalMA) < ind("macd", "signal", fastMA, slowMA, signalMA)*/; 
 		
