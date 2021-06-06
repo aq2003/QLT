@@ -528,8 +528,8 @@ namespace QL_LexerTester
 
             var_table.AddRange(arg);
 
-            string start_point = "e_" + /*((ProcessName != "") ? ProcessName + "_" : "") +*/ stack.Peek().lexeme + "_0";
-            string process_name = /*((ProcessName != "") ? ProcessName + "." : "") +*/ stack.Peek().lexeme;
+            string start_point = "e_" + ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme + "_0";
+            string process_name = /*((ProcessName != "") ? ProcessName + "_" : "") +*/ stack.Peek().lexeme;
 
             parcer_status.Pop();
 
@@ -1340,8 +1340,8 @@ namespace QL_LexerTester
                     foreach (var line in lines)
                     {
                         line.name = prefix1 + line.name.Substring(2);
-                        if (line.code == ":=") 
-                            line.arg[0] = /*prefix +*/ line.arg[0].Substring(2);
+                        //if (line.code == ":=") 
+                        //    line.arg[0] = /*prefix +*/ line.arg[0].Substring(2);
                         if (line.code == "def") 
                             line.next = prefix + line.next.Substring(2);
                     }
@@ -1354,7 +1354,7 @@ namespace QL_LexerTester
                     {
                         ProcessRecord proc = prc.ProcessTable[key];
                         //proc.ProcessName = ((prc.ProcessName != "") ? prc.ProcessName + "." : "") + proc.ProcessName;
-                        proc.StartPoint = "e_" + ((prc.ProcessName != "") ? prc.ProcessName + "_" : "") + proc.StartPoint.Substring(2);
+                        //proc.StartPoint = "e_" + ((prc.ProcessName != "") ? prc.ProcessName + "_" : "") + proc.StartPoint.Substring(2);
                         string new_key = ((prc.ProcessName != "") ? prc.ProcessName + "." : "") + proc.ProcessName;
                         ProcessTable.Add(new_key, proc);
                     }
