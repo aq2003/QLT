@@ -416,7 +416,7 @@ namespace QL_LexerTester
             // 13.08.2020
             // Embedded command may be as native (known by the QMachine) as external (unknown by the QMachine and defined in an external library)
             // External commands have to be defined in an external .NET assembly which has to be loaded by a calling script before the first use 
-            // The difference between a command and a process is that a command takes only one period of QM  to excecuteand does not contain conditions 
+            // The difference between a command and a process is that a command takes only one period of QM  to excecute and does not contain conditions 
             //  but a process takes more than one period and may contain conditions
 
             parcer_record parcer_r = new parcer_record(name);
@@ -450,14 +450,15 @@ namespace QL_LexerTester
                 for (int j = 0; j < 2 * count + 1; j++) parcer_r.arg.Add("n0");
 
                 parcer_r.code = ":=";
-                parcer_r.arg[0] = /*parent.*/ProcessTable[name].StartPoint /*"e_" + name + "_0"*/;
+                //parcer_r.arg[0] = /*parent.*/ProcessTable[name].StartPoint /*"e_" + name + "_0"*/;
+                parcer_r.arg[0] = parent.ProcessTable[name].StartPoint /*"e_" + name + "_0"*/;
 
                 int i = count + 1;
                 while (i-- > 1)
                 {
                     parcer_r.arg[2 * i] = arg[i - 1];
-                    //parcer_r.arg[2 * i - 1] = "s" + parent.ProcessTable[name].VariablesTable[i - 1];
-                    parcer_r.arg[2 * i - 1] = "s" + ProcessTable[name].VariablesTable[i - 1];
+                    //parcer_r.arg[2 * i - 1] = "s" + ProcessTable[name].VariablesTable[i - 1];
+                    parcer_r.arg[2 * i - 1] = "s" + parent.ProcessTable[name].VariablesTable[i - 1];
                 }
             }
 
@@ -528,7 +529,6 @@ namespace QL_LexerTester
             var_table.AddRange(arg);
 
             string start_point = "e_" + /*((ProcessName != "") ? ProcessName + "_" : "") +*/ stack.Peek().lexeme + "_0";
-            //string process_name = ((ProcessName != "") ? ProcessName + "_" : "") + stack.Peek().lexeme;
             string process_name = /*((ProcessName != "") ? ProcessName + "." : "") +*/ stack.Peek().lexeme;
 
             parcer_status.Pop();
@@ -1341,7 +1341,7 @@ namespace QL_LexerTester
                     {
                         line.name = prefix1 + line.name.Substring(2);
                         if (line.code == ":=") 
-                            line.arg[0] = prefix + line.arg[0].Substring(2);
+                            line.arg[0] = /*prefix +*/ line.arg[0].Substring(2);
                         if (line.code == "def") 
                             line.next = prefix + line.next.Substring(2);
                     }
