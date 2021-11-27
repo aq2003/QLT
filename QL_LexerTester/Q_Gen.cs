@@ -97,16 +97,6 @@ namespace QL_LexerTester
         {
             parcer_record r = parcer_line[pos];
 
-            // Adding variables
-            //if (r.code == "=")
-            //    if (!variables.ContainsKey(r.arg[0]))
-            //    {
-            //        gen_variable_record var = new gen_variable_record("v_" + r.arg[0], "n0");
-            //        variables.Add(r.arg[0], var);
-            //    }
-
-            //if (r.code == "..") variables.Add("v_" + r.name, new gen_variable_record("v_" + r.name, "e0"));
-
             if (r.code == "||") r.code = "e|";
 
             if (r.code == "&&") r.code = "e&";
@@ -120,33 +110,22 @@ namespace QL_LexerTester
                     r.arg[j] = variables[r.arg[j]].name;
 
 
-            //if (r.name.Substring(r.name.Length - 2) != "00")
-            //{
-            //    ParcerStack.Push(r);
-            //}
-            //else
-            //{
-            //    ParcerStack.Push(r);
-            //
-            //    while (ParcerStack.Count > 0)
-            //    {
-            //        r = ParcerStack.Pop();
+            // Print parcer_line
+            if (r.code == "+" | r.code == "m-" | r.code == "*" | r.code == "/" |
+                r.code == ">" | r.code == "<" | r.code == ">=" | r.code == "<=" |
+                r.code == "==" | r.code == "!=" | r.code == "#_" | r.code == "#^" |
+                r.code == ">=" | r.code == "<=" | r.code == "&" | r.code == "|" |
+                r.code == "=" | r.code == "+=" | r.code == "-=" | r.code == "*=" |
+                r.code == "/=" | r.code == ".." | r.code == "e|" | r.code == "e&" |
+                r.code == "[]" | r.code == "]&")
 
-                    // Print parcer_line
-                    if (r.code == "+" | r.code == "m-" | r.code == "*" | r.code == "/" |
-                        r.code == ">" | r.code == "<" | r.code == ">=" | r.code == "<=" |
-                        r.code == "==" | r.code == "!=" | r.code == "#_" | r.code == "#^" |
-                        r.code == ">=" | r.code == "<=" | r.code == "&" | r.code == "|" |
-                        r.code == "=" | r.code == "+=" | r.code == "-=" | r.code == "*=" |
-                        r.code == "/=" | r.code == ".." | r.code == "e|" | r.code == "e&")
+                gen_line.Add(r.ToString(2));
 
-                        gen_line.Add(r.ToString(2));
-
-                    else if (r.code == "-")
-                    {
-                        r.code = "m-";
-                        gen_line.Add(r.ToString(2));
-                    }
+            else if (r.code == "-")
+            {
+                r.code = "m-";
+                gen_line.Add(r.ToString(2));
+            }
 
             // 13.08.2020 commented
             /*else if (r.code == "!" | r.code == "neg")
@@ -159,7 +138,7 @@ namespace QL_LexerTester
                 gen_line.Add(r.ToString(1));*/
 
             else if (r.code == "~")
-                        gen_line.Add(r.ToString(0));
+                gen_line.Add(r.ToString(0));
 
             // 13.08.2020 commented
             /*else if (r.code == "ind")
@@ -171,11 +150,7 @@ namespace QL_LexerTester
                 else gen_line.Add(r.ToString(5));
             }*/
 
-            //else if (r.code == "error") gen_line.Add(r.condition + "\n");
-
             else gen_line.Add(r.ToString(r.arg.Count()));
-            //    }
-            //}
         }
 
     }
