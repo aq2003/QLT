@@ -1,0 +1,8 @@
+e_0	=	e0	e_101	v_a	n0
+e_101	=	e0	e_300	v_a	e_100
+e_100	new	e0	e0	slist
+e_300	+=	e0	e_400	v_a	c1
+e_400	+=	e0	e_500	v_a	c2
+e_500	+=	e0	e_601	v_a	c3
+e_601	=	e0	e0	e_600	c123
+e_600	[]	e0	e0	v_a	i0	n0	n0
