@@ -69,6 +69,7 @@ namespace QL_LexerTester
             variables.Add("v_" /*+ ProcessName*/ + "pos.abs_profit", new gen_variable_record("#AP", "p0"));
             //31.01.2016 Not supported variables.Add("pos.loss", new gen_variable_record("#S", "%0"));
             variables.Add("v_" /*+ ProcessName*/ + "log.status", new gen_variable_record("#log_status", "b0"));
+            variables.Add("v_" /*+ ProcessName*/ + "log.level", new gen_variable_record("#log_level", "i0"));
             variables.Add("v_" /*+ ProcessName*/ + "signal.OpenLong", new gen_variable_record("#SOL", "n0"));
             variables.Add("v_" /*+ ProcessName*/ + "signal.CloseLong", new gen_variable_record("#SCL", "n0"));
             variables.Add("v_" /*+ ProcessName*/ + "signal.OpenShort", new gen_variable_record("#SOS", "n0"));
