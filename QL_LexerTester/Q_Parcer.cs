@@ -494,6 +494,32 @@ namespace QL_LexerTester
             return parcer_status.Peek();
         }
 
+        string roll_up_index_get()
+        {
+            string arg2 = stack.Pop().lexeme;
+            string op = stack.Pop().lexeme;
+            string arg1 = stack.Pop().lexeme;
+
+            stack.Push(new lexeme_record('e', put_parcer_line_2_arg(op, arg1, arg2)));
+
+            parcer_status.Pop(); parcer_status.Pop();
+
+            return parcer_status.Peek();
+        }
+
+        string roll_up_index_set()
+        {
+            string arg2 = stack.Pop().lexeme;
+            string op = stack.Pop().lexeme;
+            string arg1 = stack.Pop().lexeme;
+
+            stack.Push(new lexeme_record('e', put_parcer_line_2_arg("]&", arg1, arg2)));
+
+            parcer_status.Pop(); parcer_status.Pop();
+
+            return parcer_status.Peek();
+        }
+
         string roll_up_call()
         {
             Int32 count = Convert.ToInt32(stack.Pop().lexeme);
@@ -1086,7 +1112,7 @@ namespace QL_LexerTester
                 else if (c_compare(pos)) { push_next("compare_right_argument", pos); comparison_times = 0; }
                 else if (c_add(pos)) push_next("add_right_argument", pos);
                 else if (c_mult(pos)) push_next("mult_right_argument", pos);
-                else if (c_assign(pos) & stack.Peek().type == 'n')
+                else if (c_assign(pos) & (stack.Peek().type == 'n' | stack.Peek().type == 'e'))
                 {
                     push_next("assign_right_argument", pos);
                     //if (variables_table.Where(p => p == stack.Peek().lexeme) == null) variables_table.Add(lexer_line[pos].lexeme);
@@ -1252,9 +1278,15 @@ namespace QL_LexerTester
                     new_expression(rat_closing_sq_bracket, "index_expression");
                 }
 
+                else if (c_assign(pos))
+                {
+                    roll_up_index_set();
+                    expression(pos);
+                }
+
                 else /*if (c_close_sq_bracket(pos))*/
                 {
-                    roll_up_2_args();
+                    roll_up_index_get();
                     expression(pos);
                 }
                 //else if (c_comma(pos)) new_expression(rat_comma, "call_arg");
